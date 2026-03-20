@@ -23,12 +23,17 @@ export TRAPIC_TOKEN=tr_your_token_here
 
 ### 3. Install the plugin
 
-```bash
-# Test locally
-claude --plugin-dir /path/to/trapic-plugin
+In Claude Code, run:
 
-# Or install permanently
-claude plugin install trapic --scope user
+```
+/plugin marketplace add nickjazz/trapic-plugin
+/plugin install trapic@trapic-marketplace
+```
+
+Or test locally:
+
+```bash
+claude --plugin-dir /path/to/trapic-plugin
 ```
 
 ## How it works
