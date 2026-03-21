@@ -1,5 +1,7 @@
 # Trapic — AI 程式助手的長期記憶
 
+[![Version](https://img.shields.io/badge/version-0.5.0-blue)](https://github.com/nickjazz/trapic-plugin) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
+
 [English](./README.md) | [繁體中文](./README.zh-TW.md) | [日本語](./README.ja.md)
 
 > **你的 AI 每次對話都從零開始。Trapic 解決這個問題。**
