@@ -10,14 +10,14 @@ description: >
 # Knowledge Health Report
 
 This skill provides a comprehensive view of project knowledge health using
-`trapic_health` and `trapic_decay`.
+`health` and `decay`.
 
 ## Health Check
 
 To generate a full health report:
 
 ```
-trapic_health({
+health({
   scope: ["project:<name>"]
 })
 ```
@@ -33,7 +33,7 @@ This returns:
 To inspect which traces are losing relevance:
 
 ```
-trapic_decay({
+decay({
   scope: ["project:<name>"],
   threshold: 0.3
 })

@@ -14,7 +14,7 @@ Client AI determines a decision/convention is worth recording
   |     Bad:  topic:jotai (too specific, won't match old Redux trace)
   |
   +-- Step 2: Search for conflicts using the most relevant topic tag
-  |     trapic_search({
+  |     search({
   |       types: ["decision", "convention"],
   |       tags: ["topic:<most-relevant>"],
   |       scope: ["project:<name>"],
@@ -30,13 +30,13 @@ Client AI determines a decision/convention is worth recording
   |
   +-- Step 4: Execute
   |     If conflict found:
-  |       1. trapic_create(new trace) -> get new_id
-  |       2. trapic_update({ trace_id: "<old>", superseded_by: "<new_id>" })
+  |       1. create(new trace) -> get new_id
+  |       2. update({ trace_id: "<old>", superseded_by: "<new_id>" })
   |          for conflicting decisions
-  |       3. trapic_update({ trace_id: "<old>", status: "deprecated" })
+  |       3. update({ trace_id: "<old>", status: "deprecated" })
   |          for invalidated conventions
   |     If no conflict:
-  |       1. trapic_create(new trace)
+  |       1. create(new trace)
   |
   +-- Step 5: Silent completion
         Do NOT announce or summarize to the user.

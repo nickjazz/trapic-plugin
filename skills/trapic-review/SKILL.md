@@ -25,7 +25,7 @@ git diff --staged
 
 **Step 2** — Fetch project conventions:
 ```
-trapic_search({
+search({
   types: ["convention", "decision", "preference"],
   scope: ["project:<name>"],
   limit: 20
@@ -49,7 +49,7 @@ or when the user wants to clean up old knowledge.
 
 **Step 1** — Scan for stale traces:
 ```
-trapic_decay({
+decay({
   scope: ["project:<name>"],
   threshold: 0.3
 })
@@ -58,8 +58,8 @@ trapic_decay({
 **Step 2** — For each stale trace, judge whether it is still valid by
 checking current code state and recent decisions:
 
-- Still valid: `trapic_review_stale({ trace_id: "<id>", action: "confirm" })`
-- Outdated: `trapic_review_stale({ trace_id: "<id>", action: "deprecate" })`
+- Still valid: `review_stale({ trace_id: "<id>", action: "confirm" })`
+- Outdated: `review_stale({ trace_id: "<id>", action: "deprecate" })`
 
 **Step 3** — Report a summary of actions taken to the user:
 - How many traces reviewed

@@ -47,7 +47,7 @@ Connects to `mcp.trapic.ai` with 7 tools: `recall`, `create`, `search`, `update`
 
 ## How it works
 
-1. **Session start** — Hook detects git project/branch, triggers `trapic_recall`
+1. **Session start** — Hook detects git project/branch, triggers `recall`
 2. **During coding** — `trapic-knowledge` skill silently captures decisions with topic tags
 3. **Before each decision** — Conflict detection searches by topic, supersedes old traces
 4. **Search** — `trapic-search` infers topic tags from vague queries for semantic matching

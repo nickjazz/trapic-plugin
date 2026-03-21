@@ -50,7 +50,7 @@ Classify each trace into one of five types:
 - **preference**: User preferences (e.g., "prefer minimal UI, no emoji")
 
 ```
-trapic_create({
+create({
   content: "What was decided/discovered",
   context: "Why this matters",
   tags: ["decision", "topic:area-1", "topic:area-2", "topic:area-3"],
@@ -81,11 +81,11 @@ Silently continue the conversation.
 
 When completing work recorded as a plan trace:
 
-- Use `trapic_update` to change tag `plan` to `done` and update content
+- Use `update` to change tag `plan` to `done` and update content
 - Mark obsolete traces as `superseded` or `deprecated`
 
 ## Auto-summary on Session End
 
 Before ending a long conversation (5+ messages with meaningful work), create
-individual traces for each key decision or discovery using `trapic_create`.
+individual traces for each key decision or discovery using `create`.
 One trace per decision/fact/convention.

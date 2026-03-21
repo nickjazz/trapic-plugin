@@ -10,7 +10,7 @@ description: >
 # Smart Search
 
 Search project knowledge with topic-inferred filtering. When the user asks
-a vague question, infer topic tags and domain before calling `trapic_search`
+a vague question, infer topic tags and domain before calling `search`
 to expand semantic reach beyond keyword matching.
 
 ## Why Topic Inference Matters
@@ -52,9 +52,9 @@ Domain values: `architecture`, `security`, `auth`, `api`, `database`,
 `design`, `deployment`, `testing`, `ui`, `performance`, `infrastructure`,
 `frontend`, `backend`, `strategy`
 
-**Step 4 — Call trapic_search** with enriched parameters:
+**Step 4 — Call search** with enriched parameters:
 ```
-trapic_search({
+search({
   query: "<original keyword>",
   tags: ["topic:<inferred-1>", "topic:<inferred-2>", "topic:<inferred-3>"],
   scope: ["project:<name>", "domain:<inferred>"],
@@ -75,7 +75,7 @@ a wider net than either alone.
 User: "what did we decide about caching?"
   |
   v
-trapic_search({
+search({
   query: "cache",
   tags: ["topic:caching", "topic:performance", "topic:infrastructure"],
   scope: ["project:myapp", "domain:infrastructure"],
