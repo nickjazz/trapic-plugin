@@ -2,62 +2,71 @@
 
 AI long-term memory for coding assistants — auto-recall, knowledge capture with conflict detection, and smart decay.
 
-## What it does
+## Install
 
-- **Auto-recall**: Every new session automatically loads project knowledge — foundations, team updates, cross-branch activity
-- **Auto-capture**: Decisions and conventions are silently recorded with topic tags as you work
-- **Conflict detection**: Topic-based search catches contradictions even when technology names differ (e.g., Redux vs Jotai)
-- **Smart decay**: Stale knowledge is flagged and reviewed automatically — your knowledge base stays fresh
+```
+/plugin install nickjazz/trapic-plugin
+```
 
-## Quick Start
-
-### 1. Get a Trapic token
-
-Sign up at [trapic.ai](https://trapic.ai) and create an API token in your dashboard.
-
-### 2. Set your token
+Then set your token:
 
 ```bash
 export TRAPIC_TOKEN=tr_your_token_here
 ```
 
-### 3. Install the plugin
+Sign up at [trapic.ai](https://trapic.ai) to get your API token.
 
-In Claude Code, run:
+## What you get
 
-```
-/plugin marketplace add nickjazz/trapic-plugin
-/plugin install trapic@trapic-marketplace
-```
+### 4 Skills
 
-Or test locally:
+| Skill | Trigger | What it does |
+|-------|---------|--------------|
+| **trapic-knowledge** | Auto (while coding) | Silently captures decisions, conventions, and facts with conflict detection |
+| **trapic-search** | `/trapic-search` or "find traces about..." | Smart search with topic-inferred filtering — expands vague queries semantically |
+| **trapic-review** | `/trapic-review` | Pre-commit convention check + stale knowledge cleanup |
+| **trapic-health** | `/trapic-health` or "knowledge status" | Health score, type distribution, decay metrics |
 
-```bash
-claude --plugin-dir /path/to/trapic-plugin
-```
+### Auto-recall Hook
+
+Every session automatically loads project knowledge on startup — foundations, team updates, cross-branch activity. No manual action needed.
+
+### MCP Server
+
+Connects to `mcp.trapic.ai` with 7 tools: `recall`, `create`, `search`, `update`, `decay`, `review_stale`, `health`.
 
 ## How it works
 
-1. **Session start** → Hook runs `recall.sh` → detects git project/branch
-2. **Claude calls `trapic_recall`** → loads structured briefing from Trapic MCP server
-3. **During conversation** → SKILL.md rules guide auto-capture of decisions/conventions
-4. **Before each decision** → conflict detection searches by topic tags, supersedes old traces
-5. **Background** → daily decay scan flags stale knowledge for AI review
+1. **Session start** — Hook detects git project/branch, triggers `trapic_recall`
+2. **During coding** — `trapic-knowledge` skill silently captures decisions with topic tags
+3. **Before each decision** — Conflict detection searches by topic, supersedes old traces
+4. **Search** — `trapic-search` infers topic tags from vague queries for semantic matching
+5. **Before commit** — `/trapic-review` checks staged diff against project conventions
+6. **Maintenance** — `/trapic-health` shows knowledge health, decay flags stale traces
 
 ## Plugin Structure
 
 ```
 trapic-plugin/
 ├── .claude-plugin/
-│   └── plugin.json        # Plugin manifest
-├── .mcp.json              # MCP server connection (hosted at mcp.trapic.ai)
+│   ├── plugin.json              # Plugin manifest
+│   └── marketplace.json         # Marketplace listing
+├── .mcp.json                    # MCP server connection
 ├── hooks/
-│   └── hooks.json         # SessionStart hook config
+│   └── hooks.json               # SessionStart auto-recall hook
 ├── scripts/
-│   └── recall.sh          # Auto-detect project/branch, trigger recall
+│   └── recall.sh                # Auto-detect project/branch
 └── skills/
-    └── trapic-knowledge/
-        └── SKILL.md        # Auto-capture rules, conflict detection, decay review
+    ├── trapic-knowledge/        # Auto-capture + conflict detection
+    │   ├── SKILL.md
+    │   └── references/
+    │       └── conflict-detection.md
+    ├── trapic-search/           # Smart search with topic inference
+    │   └── SKILL.md
+    ├── trapic-review/           # Pre-commit check + stale cleanup
+    │   └── SKILL.md
+    └── trapic-health/           # Health report + decay scan
+        └── SKILL.md
 ```
 
 ## Requirements
