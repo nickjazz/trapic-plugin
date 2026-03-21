@@ -104,9 +104,3 @@ When completing work recorded as a plan trace:
 
 - Use `trapic-update` to change tag `plan` to `done` and update content
 - Mark obsolete traces as `superseded` or `deprecated`
-
-## Auto-summary on Session End
-
-Before ending a long conversation (5+ messages with meaningful work), create
-individual traces for each key decision or discovery using `trapic-create`.
-One trace per decision/fact/convention.
