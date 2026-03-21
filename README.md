@@ -4,8 +4,12 @@ AI long-term memory for coding assistants — auto-recall, knowledge capture wit
 
 ## Install
 
-```
-/plugin install nickjazz/trapic-plugin
+```bash
+# 1. Add the marketplace
+/plugin marketplace add nickjazz/trapic-plugin
+
+# 2. Install the plugin
+/plugin install trapic@nickjazz-trapic-plugin
 ```
 
 Then set your token:
@@ -15,6 +19,12 @@ export TRAPIC_TOKEN=tr_your_token_here
 ```
 
 Sign up at [trapic.ai](https://trapic.ai) to get your API token.
+
+### Update
+
+```
+/plugin marketplace update nickjazz-trapic-plugin
+```
 
 ## What you get
 
