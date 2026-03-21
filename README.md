@@ -110,6 +110,14 @@ Restart Claude Code after setup.
 /plugin marketplace update nickjazz-trapic-plugin
 ```
 
+### Uninstall
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/uninstall.sh | bash
+```
+
+Removes MCP config, hooks, CLAUDE.md instructions, and optionally your token.
+
 ## What you get
 
 ### 7 MCP Tools
