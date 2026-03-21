@@ -28,7 +28,7 @@ else
   echo ""
   echo "  Get your token at https://trapic.ai"
   echo ""
-  read -p "  Paste your token (tr_...): " TOKEN
+  read -p "  Paste your token (tr_...): " TOKEN < /dev/tty
   if [ -z "$TOKEN" ]; then
     echo "  Skipped. You can add it later to $SETTINGS"
     TOKEN=""
