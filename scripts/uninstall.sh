@@ -89,7 +89,7 @@ fi
 
 # ── 4. Remove skills ─────────────────────────────────────────────────
 REMOVED_SKILLS=0
-for SKILL_NAME in trapic-search trapic-health trapic-review; do
+for SKILL_NAME in trapic-knowledge trapic-search trapic-health trapic-review; do
   SKILL_DIR=".claude/skills/$SKILL_NAME"
   if [ -d "$SKILL_DIR" ]; then
     rm -rf "$SKILL_DIR"

@@ -352,7 +352,60 @@ trapic-search({
 3. Report summary to user
 SKILLEOF
 
-  echo -e "${GREEN}✓${NC} Skills installed to $SKILLS_DIR/ (trapic-search, trapic-health, trapic-review)"
+  # trapic-knowledge skill (auto-capture, not user-invocable)
+  mkdir -p "$SKILLS_DIR/trapic-knowledge"
+  cat > "$SKILLS_DIR/trapic-knowledge/SKILL.md" <<'SKILLEOF'
+---
+name: trapic-knowledge
+description: >
+  This skill MUST run automatically during coding sessions. It captures
+  technical decisions, conventions, facts, milestones, and preferences
+  silently using trapic-create. Triggers on any technical decision,
+  convention discussion, non-obvious discovery, or user preference.
+user-invocable: false
+---
+
+# Auto-Capture Knowledge
+
+This skill MUST run automatically and silently during every coding session.
+You do NOT wait for the user to ask — proactively detect and capture
+knowledge as it happens.
+
+**IMPORTANT:** Call `trapic-create` MCP tool. Do NOT look for local files.
+
+## ALWAYS capture when:
+- A technical decision is made (framework, library, architecture, API design)
+- A coding convention or pattern is established or discussed
+- A non-obvious fact or gotcha is discovered (config quirks, workarounds)
+- A project milestone or status change occurs
+- The user states a preference about workflow, style, or approach
+
+## How to capture:
+```
+trapic-create({
+  content: "One sentence: what was decided/discovered",
+  context: "Why this matters",
+  tags: ["<type>", "topic:<area-1>", "topic:<area-2>", "topic:<area-3>"],
+  scope: ["project:<name>", "branch:<branch>", "domain:<area>"],
+  confidence: "high"
+})
+```
+
+## Tag rules:
+- First tag = type: `decision`, `fact`, `convention`, `state`, or `preference`
+- Next 3 tags = `topic:` tags describing the problem domain (NOT the technology)
+
+## Conflict Detection
+Before creating a `decision` or `convention`:
+1. `trapic-search({ types: ["decision", "convention"], tags: ["topic:<relevant>"], scope: ["project:<name>"], limit: 10 })`
+2. Conflict (same question, different answer) → create new + `trapic-update({ trace_id: "<old>", superseded_by: "<new>" })`
+3. No conflict → just create
+
+## Silent Operation
+After creating a trace, do NOT announce or summarize it. Silently continue.
+SKILLEOF
+
+  echo -e "${GREEN}✓${NC} Skills installed to $SKILLS_DIR/ (trapic-knowledge, trapic-search, trapic-health, trapic-review)"
 else
   echo -e "${YELLOW}!${NC} Not in a git repo — skipping skills installation"
 fi
