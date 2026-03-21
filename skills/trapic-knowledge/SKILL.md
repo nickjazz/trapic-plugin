@@ -28,21 +28,16 @@ directories. All knowledge is stored on the remote Trapic server.
 
 ## Scope Rules
 
-Every trace MUST include a `scope` array with 2-3 levels:
+Every trace MUST include a `scope` array with 2 levels:
 
 - Level 1: `project:<name>` — from git remote or directory name
 - Level 2: `branch:<branch>` — from `git branch --show-current`
-- Level 3: `domain:<area>` — inferred from work context
 
-Domain values: `architecture`, `security`, `auth`, `api`, `database`,
-`design`, `deployment`, `testing`, `ui`, `performance`, `infrastructure`,
-`frontend`, `backend`, `strategy`
+## Topic Tags (REQUIRED for ALL traces)
 
-## Topic Tags (REQUIRED for decision/convention)
-
-Every decision or convention trace MUST include **exactly 3** `topic:` tags
-describing its semantic domain. Tags describe the **problem area**, not the
-specific technology chosen.
+Every trace MUST include **exactly 3** `topic:` tags describing the problem area.
+Topics are the primary way traces are discovered via search.
+Tags describe the **problem area**, not the technology.
 
 | Technology choice | Topic tags |
 |-------------------|------------|
@@ -65,7 +60,7 @@ trapic-create({
   content: "What was decided/discovered",
   context: "Why this matters",
   tags: ["decision", "topic:area-1", "topic:area-2", "topic:area-3"],
-  scope: ["project:<name>", "branch:main", "domain:auth"],
+  scope: ["project:<name>", "branch:main"],
   confidence: "high|medium|low"
 })
 ```

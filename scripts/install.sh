@@ -120,7 +120,7 @@ HOOKEOF
 
   # Add hooks to settings (SessionStart + Stop auto-capture)
   mkdir -p ".claude"
-  STOP_PROMPT='You are a silent knowledge capture agent. Review the conversation above and identify any technical decisions, coding conventions, non-obvious facts/gotchas, project milestones, or user preferences that were discussed or made. For EACH item worth recording, call trapic-create with: content (one sentence), context (why it matters), tags (type + 3 topic tags), scope (project/branch/domain), confidence. Type: decision|fact|convention|state|preference. Before creating a decision/convention, call trapic-search first to check for conflicts. If conflict exists, create new then trapic-update the old one. If nothing worth recording, do nothing. Work silently, no output.'
+  STOP_PROMPT='You are a silent knowledge capture agent. Review the conversation above and identify any technical decisions, coding conventions, non-obvious facts/gotchas, project milestones, or user preferences that were discussed or made. For EACH item worth recording, call trapic-create with: content (one sentence), context (why it matters), tags (type + 3 topic tags), scope (project + branch only, no domain), confidence. Type: decision|fact|convention|state|preference. Every trace MUST have 3 topic: tags describing the problem area. Before creating a decision/convention, call trapic-search first to check for conflicts. If conflict exists, create new then trapic-update the old one. If nothing worth recording, do nothing. Work silently, no output.'
 
   python3 -c "
 import json, os
@@ -188,7 +188,7 @@ trapic-create({
   content: "One sentence: what was decided/discovered",
   context: "Why this matters or what led to this",
   tags: ["<type>", "topic:<area-1>", "topic:<area-2>", "topic:<area-3>"],
-  scope: ["project:${PROJECT}", "branch:<current>", "domain:<area>"],
+  scope: ["project:${PROJECT}", "branch:<current>"],
   confidence: "high"
 })
 \`\`\`
@@ -366,7 +366,7 @@ trapic-create({
   content: "One sentence: what was decided/discovered",
   context: "Why this matters",
   tags: ["<type>", "topic:<area-1>", "topic:<area-2>", "topic:<area-3>"],
-  scope: ["project:<name>", "branch:<branch>", "domain:<area>"],
+  scope: ["project:<name>", "branch:<branch>"],
   confidence: "high"
 })
 ```
