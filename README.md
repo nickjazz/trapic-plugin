@@ -12,13 +12,19 @@ AI long-term memory for coding assistants — auto-recall, knowledge capture wit
 /plugin install trapic@nickjazz-trapic-plugin
 ```
 
-Then set your token:
+Then set your token in `~/.claude/settings.json`:
 
-```bash
-export TRAPIC_TOKEN=tr_your_token_here
+```json
+{
+  "env": {
+    "TRAPIC_TOKEN": "tr_your_token_here"
+  }
+}
 ```
 
 Sign up at [trapic.ai](https://trapic.ai) to get your API token.
+
+Restart Claude Code after adding the token.
 
 ### Update
 
@@ -63,26 +69,21 @@ trapic-plugin/
 │   └── marketplace.json         # Marketplace listing
 ├── .mcp.json                    # MCP server connection
 ├── hooks/
-│   └── hooks.json               # SessionStart auto-recall (auto-loaded)
+│   └── hooks.json               # SessionStart auto-recall
 ├── scripts/
-│   └── recall.sh                # Auto-detect project/branch
+│   ├── recall.sh                # Auto-detect project/branch + token check
+│   └── setup.sh                 # Interactive setup guide
 └── skills/
     ├── trapic-knowledge/        # Auto-capture + conflict detection
-    │   ├── SKILL.md
-    │   └── references/
-    │       └── conflict-detection.md
     ├── trapic-search/           # Smart search with topic inference
-    │   └── SKILL.md
     ├── trapic-review/           # Pre-commit check + stale cleanup
-    │   └── SKILL.md
     └── trapic-health/           # Health report + decay scan
-        └── SKILL.md
 ```
 
 ## Requirements
 
 - [Claude Code](https://claude.ai/claude-code) CLI
-- A Trapic account with API token (`TRAPIC_TOKEN` env var)
+- A Trapic account with API token (`TRAPIC_TOKEN` in `~/.claude/settings.json`)
 
 ## Links
 
