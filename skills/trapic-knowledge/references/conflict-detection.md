@@ -34,15 +34,20 @@ Client AI determines a decision/convention is worth recording
   +-- Step 4: Execute
   |     If conflict found:
   |       1. trapic-create(new trace) -> get new_id
+  |          content MUST mention superseded decision:
+  |            "Use Jotai for state management (supersedes previous Redux decision)"
+  |          context MUST explain the conflict:
+  |            "Conflict: old trace said 'Use Redux'. Changed because less boilerplate."
   |       2. trapic-update({ trace_id: "<old>", superseded_by: "<new_id>" })
-  |          for conflicting decisions
-  |       3. trapic-update({ trace_id: "<old>", status: "deprecated" })
-  |          for invalidated conventions
+  |       3. For invalidated conventions:
+  |          trapic-update({ trace_id: "<old>", status: "deprecated" })
   |     If no conflict:
   |       1. trapic-create(new trace)
   |
   +-- Step 5: Silent completion
         Do NOT announce or summarize to the user.
+        Conflict history is preserved in the trace content/context
+        and will appear in future recall briefings.
 ```
 
 ## Scenario Examples
