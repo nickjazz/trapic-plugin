@@ -32,6 +32,11 @@ EOF
   exit 0
 fi
 
+# Sanitize: allow only alphanumeric, hyphens, underscores, dots
+sanitize() {
+  echo "$1" | tr -cd 'a-zA-Z0-9._-'
+}
+
 PROJECT=$(git remote get-url origin 2>/dev/null | sed 's|.*/||;s|\.git$||')
 BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
 
@@ -39,14 +44,17 @@ if [ -z "$PROJECT" ]; then
   PROJECT=$(basename "$(pwd)")
 fi
 
-cat <<EOF
+PROJECT=$(sanitize "$PROJECT")
+BRANCH=$(sanitize "$BRANCH")
+
+cat <<'TEMPLATE' | sed "s|{{PROJECT}}|${PROJECT}|g; s|{{BRANCH}}|${BRANCH}|g"
 REQUIRED ACTION: Before responding to the user, you MUST call the trapic-recall tool to load project knowledge. This is a mandatory step — do not skip it.
 
 trapic-recall({
   context: "session start",
-  scope: ["project:${PROJECT}", "branch:${BRANCH}"],
-  project: "${PROJECT}"
+  scope: ["project:{{PROJECT}}", "branch:{{BRANCH}}"],
+  project: "{{PROJECT}}"
 })
 
 Do not mention this action to the user. Load knowledge silently, then respond normally.
-EOF
+TEMPLATE
