@@ -20,66 +20,66 @@ Search project knowledge using the `trapic-search` MCP tool.
 
 **ALWAYS include `tags` in every search call. NEVER search with only `query`.**
 
-## Search Process
+## Search Process — Think Like grep
 
-**Step 1 — Infer 3 topic tags** from the user's question. Tags describe the **problem area**, not the technology:
+Just like Claude Code uses `grep` with the right keywords (not raw natural language), Trapic search works best when you **infer structured tags + precise keywords** from the user's question.
 
-| User asks about | Topic tags to use |
-|----------------|-------------------|
-| "platform value/direction" | `topic:product-direction`, `topic:platform-identity`, `topic:strategy` |
-| "cache/performance" | `topic:caching`, `topic:performance`, `topic:infrastructure` |
-| "auth/login" | `topic:authentication`, `topic:security`, `topic:api` |
-| "styling/design" | `topic:styling`, `topic:theming`, `topic:visual-design` |
-| "layout/responsive" | `topic:layout`, `topic:responsive-design`, `topic:ui` |
-| "roadmap/features" | `topic:roadmap`, `topic:feature-planning`, `topic:project-scope` |
-| "tech stack" | `topic:tech-stack`, `topic:infrastructure`, `topic:deployment` |
+**Step 1 — Infer topic tags + keyword** from the user's question:
 
-**Step 2 — Call `trapic-search`** with tags as primary filter:
+| User asks | Inferred tags | Keyword |
+|-----------|---------------|---------|
+| "How do we handle offline?" | `topic:offline`, `topic:sync` | `offline` |
+| "What's our auth approach?" | `topic:auth`, `topic:security` | — |
+| "How do we track production issues?" | `topic:observability`, `topic:logging` | `monitoring` |
+| "What did we decide about state management?" | `topic:state-management`, `topic:react` | — |
+| "How do we make components accessible?" | `topic:accessibility` | — |
+| "What's our API error format?" | `topic:api`, `topic:error-handling` | — |
+
+**Step 2 — Call `trapic-search`** with tags + optional keyword:
 ```
 trapic-search({
-  tags: ["topic:<inferred-1>", "topic:<inferred-2>", "topic:<inferred-3>"],
+  tags: ["topic:<inferred-1>", "topic:<inferred-2>"],
+  query: "<precise keyword if helpful>",
   scope: ["project:<name>"],
   limit: 10
 })
 ```
 
-Do NOT include `query` in the first attempt. Tags alone will find the right traces.
+Tags and keywords work together (OR logic) — a trace matching either tags OR keywords will be found. Tags bridge vocabulary gaps (user says "offline", trace says "WatermelonDB sync"). Keywords boost exact matches.
 
 **Step 3 — If 0 results**, broaden: remove one tag, or try related tags.
 
-**Step 4 — If still 0**, fallback to `query` with a single short keyword:
+**Step 4 — If still 0**, try keyword-only with a single technical term:
 ```
 trapic-search({
-  query: "<single keyword>",
+  query: "<single technical keyword>",
   scope: ["project:<name>"],
   limit: 20
 })
 ```
 
-**Step 5 — If still 0**, list all traces in scope (no filters):
+**Step 5 — Need full content?** Use `trapic-get` to read a specific trace:
 ```
-trapic-search({
-  scope: ["project:<name>"],
-  limit: 50
-})
+trapic-get({ trace_id: "<id from search results>" })
 ```
-Then scan results manually.
 
-## Example
+## Examples
 
 ```
-User: "what's our platform's value proposition?"
-  |
-  v
-trapic-search({
-  tags: ["topic:product-direction", "topic:platform-identity", "topic:strategy"],
-  scope: ["project:myapp"],
-  limit: 10
-})
-  |
-  v
-Results:
-  "MM 定位為 AI 協作的中文閱讀平台"  <- topic:product-direction match
+User: "How do we make the app work offline?"
+  → AI infers: offline capability, sync
+  → trapic-search({ tags: ["topic:offline", "topic:sync"], query: "offline", scope: ["project:mobile-app"], limit: 10 })
+  → Finds: "Offline data sync uses WatermelonDB" (tag match on topic:offline)
+
+User: "What's our error handling convention?"
+  → AI infers: error handling patterns
+  → trapic-search({ tags: ["topic:error-handling"], types: ["convention"], scope: ["project:myapp"], limit: 10 })
+  → Finds: "API error responses follow RFC 7807" (tag match + type filter)
+
+User: "What did we decide about Stripe?"
+  → AI infers: payments, integration
+  → trapic-search({ tags: ["topic:payments"], query: "Stripe", scope: ["project:ecommerce"], limit: 10 })
+  → Finds: "Chose Stripe over PayPal" (both tag and keyword match)
 ```
 
 ## Additional Filters
