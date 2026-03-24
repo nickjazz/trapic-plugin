@@ -38,22 +38,21 @@ Just like Claude Code uses `grep` with the right keywords (not raw natural langu
 **Step 2 — Call `trapic-search`** with tags + optional keyword:
 ```
 trapic-search({
-  tags: ["topic:<inferred-1>", "topic:<inferred-2>"],
+  tags: ["topic:<inferred-1>", "topic:<inferred-2>", "project:<name>"],
   query: "<precise keyword if helpful>",
-  scope: ["project:<name>"],
   limit: 10
 })
 ```
 
-Tags and keywords work together (OR logic) — a trace matching either tags OR keywords will be found. Tags bridge vocabulary gaps (user says "offline", trace says "WatermelonDB sync"). Keywords boost exact matches.
+Tags and keywords work together — `project:`/`branch:` tags use AND logic (must match all), `topic:` tags use OR logic (any match). Keywords boost exact matches.
 
-**Step 3 — If 0 results**, broaden: remove one tag, or try related tags.
+**Step 3 — If 0 results**, broaden: remove one topic tag, or try related tags.
 
 **Step 4 — If still 0**, try keyword-only with a single technical term:
 ```
 trapic-search({
+  tags: ["project:<name>"],
   query: "<single technical keyword>",
-  scope: ["project:<name>"],
   limit: 20
 })
 ```
@@ -68,17 +67,17 @@ trapic-get({ trace_id: "<id from search results>" })
 ```
 User: "How do we make the app work offline?"
   → AI infers: offline capability, sync
-  → trapic-search({ tags: ["topic:offline", "topic:sync"], query: "offline", scope: ["project:mobile-app"], limit: 10 })
+  → trapic-search({ tags: ["topic:offline", "topic:sync", "project:mobile-app"], query: "offline" })
   → Finds: "Offline data sync uses WatermelonDB" (tag match on topic:offline)
 
 User: "What's our error handling convention?"
   → AI infers: error handling patterns
-  → trapic-search({ tags: ["topic:error-handling"], types: ["convention"], scope: ["project:myapp"], limit: 10 })
+  → trapic-search({ tags: ["topic:error-handling", "project:myapp"], types: ["convention"] })
   → Finds: "API error responses follow RFC 7807" (tag match + type filter)
 
 User: "What did we decide about Stripe?"
   → AI infers: payments, integration
-  → trapic-search({ tags: ["topic:payments"], query: "Stripe", scope: ["project:ecommerce"], limit: 10 })
+  → trapic-search({ tags: ["topic:payments", "project:ecommerce"], query: "Stripe" })
   → Finds: "Chose Stripe over PayPal" (both tag and keyword match)
 ```
 

@@ -26,12 +26,14 @@ decisions, facts, conventions, and milestones as they happen.
 `trapic-search`, `trapic-update`). Do NOT look for local files or `.trapic/`
 directories. All knowledge is stored on the remote Trapic server.
 
-## Scope Rules
+## Tags — Everything in One Array (REQUIRED)
 
-Every trace MUST include a `scope` array with 2 levels:
+Every trace uses a single `tags` array containing ALL metadata:
 
-- Level 1: `project:<name>` — from git remote or directory name
-- Level 2: `branch:<branch>` — from `git branch --show-current`
+- **Type tag** (first): `decision`, `fact`, `convention`, `state`, or `preference`
+- **Topic tags** (3): `topic:auth`, `topic:api`, etc. — problem area, not technology
+- **Project tag**: `project:<name>` — from git remote or directory name
+- **Branch tag**: `branch:<branch>` — from `git branch --show-current`
 
 ## Topic Tags (REQUIRED for ALL traces)
 
@@ -59,8 +61,7 @@ Classify each trace into one of five types:
 trapic-create({
   content: "What was decided/discovered",
   context: "Why this matters",
-  tags: ["decision", "topic:area-1", "topic:area-2", "topic:area-3"],
-  scope: ["project:<name>", "branch:main"],
+  tags: ["decision", "topic:area-1", "topic:area-2", "topic:area-3", "project:<name>", "branch:main"],
   confidence: "high|medium|low"
 })
 ```
@@ -75,8 +76,7 @@ Use `trapic-search` for the conflict search:
 ```
 trapic-search({
   types: ["decision", "convention"],
-  tags: ["topic:<most-relevant>"],
-  scope: ["project:<name>"],
+  tags: ["topic:<most-relevant>", "project:<name>"],
   limit: 10
 })
 ```
