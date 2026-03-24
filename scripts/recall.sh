@@ -52,7 +52,7 @@ REQUIRED ACTION: Before responding to the user, you MUST call the trapic-recall 
 
 trapic-recall({
   context: "session start",
-  scope: ["project:{{PROJECT}}", "branch:{{BRANCH}}"],
+  tags: ["project:{{PROJECT}}", "branch:{{BRANCH}}"],
   project: "{{PROJECT}}"
 })
 
