@@ -12,34 +12,54 @@ user-invocable: false
 # Auto-Capture Knowledge
 
 This skill MUST run automatically and silently during every coding session.
-You do NOT wait for the user to ask — you proactively detect and capture
-decisions, facts, conventions, and milestones as they happen.
+You do NOT wait for the user to ask — proactively detect and capture.
 
-**CRITICAL:** Call `trapic-create` whenever:
+**IMPORTANT:** Call `trapic-create` MCP tool. Do NOT look for local files.
+
+## ALWAYS capture when:
 - A technical decision is made (framework, library, architecture, API design)
-- A coding convention or pattern is established or discussed
-- A non-obvious fact or gotcha is discovered (config quirks, workarounds, bugs)
+- A coding convention or pattern is established
+- A non-obvious fact or gotcha is discovered (config quirks, workarounds)
 - A project milestone or status change occurs
 - The user states a preference about workflow, style, or approach
 
-**IMPORTANT:** You MUST call the Trapic MCP tools (`trapic-create`,
-`trapic-search`, `trapic-update`). Do NOT look for local files or `.trapic/`
-directories. All knowledge is stored on the remote Trapic server.
+## Do NOT capture:
+- Single-line CSS tweaks (cursor-pointer, font-size, color changes)
+- Import fixes, unused variable removal
+- Typo fixes, formatting changes
+- Anything already in git history
+- Trivial UI micro-adjustments
+- Temporary debugging steps
 
-## Tags — Everything in One Array (REQUIRED)
+## How to capture:
 
-Every trace uses a single `tags` array containing ALL metadata:
+```
+trapic-create({
+  content: "One sentence in ENGLISH: what was decided/discovered",
+  context: "Why this matters (in English)",
+  type: "decision",
+  tags: ["topic:<area-1>", "topic:<area-2>", "topic:<area-3>", "project:<name>", "branch:<branch>"],
+  confidence: "high"
+})
+```
 
-- **Type tag** (first): `decision`, `fact`, `convention`, `state`, or `preference`
-- **Topic tags** (3): `topic:auth`, `topic:api`, etc. — problem area, not technology
-- **Project tag**: `project:<name>` — from git remote or directory name
-- **Branch tag**: `branch:<branch>` — from `git branch --show-current`
+## Rules:
+- **Content MUST be in English** — even if conversation is in another language
+- **type parameter is required** — choose accurately, not everything is "decision"
+- **project: tag is required** — tool will reject without it
+- **3 topic: tags** describe the problem domain (NOT the technology)
+- Do NOT put the type in tags — use the `type` parameter
 
-## Topic Tags (REQUIRED for ALL traces)
+## Type guide:
+- `decision`: A choice made between alternatives (e.g. "Use Stripe Connect Standard instead of Express for Malaysia")
+- `fact`: A truth discovered (e.g. "R2 presigned URLs reject response-content-disposition override")
+- `convention`: A pattern agreed (e.g. "All DB access via SECURITY DEFINER RPCs, never .from()")
+- `state`: A status change (e.g. "Marketplace V2 with Stripe payments is live")
+- `preference`: User preference (e.g. "Prefer small border-radius, tech aesthetic like frames.ag")
 
-Every trace MUST include **exactly 3** `topic:` tags describing the problem area.
-Topics are the primary way traces are discovered via search.
-Tags describe the **problem area**, not the technology.
+## Topic Tags
+
+Topics describe the **problem area**, not the technology:
 
 | Technology choice | Topic tags |
 |-------------------|------------|
@@ -47,55 +67,21 @@ Tags describe the **problem area**, not the technology.
 | Next.js / Vite | `topic:framework`, `topic:ssr`, `topic:bundler` |
 | Redis / In-memory | `topic:caching`, `topic:performance`, `topic:infrastructure` |
 
-## Knowledge Types
-
-Classify each trace into one of five types:
-
-- **decision**: Technical choices (e.g., "chose Vite over Next.js because no SSR needed")
-- **fact**: Non-obvious discoveries (e.g., "pgvector requires search_path fix")
-- **convention**: Established patterns (e.g., "use CSS variables for all theming")
-- **state**: Project milestones (e.g., "auth module complete")
-- **preference**: User preferences (e.g., "prefer minimal UI, no emoji")
-
-```
-trapic-create({
-  content: "What was decided/discovered",
-  context: "Why this matters",
-  tags: ["decision", "topic:area-1", "topic:area-2", "topic:area-3", "project:<name>", "branch:main"],
-  confidence: "high|medium|low"
-})
-```
-
 ## Conflict Detection
 
-Before creating a decision or convention, run a mandatory closed-loop
-conflict check. For the complete 5-step process, see
-[references/conflict-detection.md](references/conflict-detection.md).
+Before creating a `decision` or `convention`:
+1. `trapic-search({ types: ["decision", "convention"], tags: ["topic:<relevant>", "project:<name>"], limit: 10 })`
+2. Conflict (same question, different answer) → create new + `trapic-update({ trace_id: "<old>", superseded_by: "<new>" })`
+3. No conflict → just create
 
-Use `trapic-search` for the conflict search:
-```
-trapic-search({
-  types: ["decision", "convention"],
-  tags: ["topic:<most-relevant>", "project:<name>"],
-  limit: 10
-})
-```
-
-## Do NOT Record
-
-- Trivial changes (typo fixes, formatting)
-- Temporary debugging steps
-- Information already in git history
-- Duplicate of existing knowledge
+Handle silently. Do NOT ask the user.
 
 ## Silent Operation
 
-After creating a trace, do NOT announce or summarize it to the user.
-Silently continue the conversation.
+After creating a trace, do NOT announce or summarize it. Silently continue.
 
 ## Trace Lifecycle
 
-When completing work recorded as a plan trace:
-
-- Use `trapic-update` to change tag `plan` to `done` and update content
+When completing work recorded as a state trace:
+- Use `trapic-update` to update content to reflect completion
 - Mark obsolete traces as `superseded` or `deprecated`
