@@ -10,28 +10,69 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo ""
-echo -e "${BLUE}=== Trapic Manual Install ===${NC}"
+echo -e "${BLUE}=== Trapic Install ===${NC}"
 echo ""
+
+# ── 0. Mode selection ─────────────────────────────────────────────────
+# Detect mode: cloud (default) or self-hosted
+MODE="cloud"
+MCP_URL="https://mcp.trapic.ai/mcp"
+
+if [ -n "$TRAPIC_URL" ]; then
+  MODE="self-hosted"
+  MCP_URL="$TRAPIC_URL"
+  echo -e "${GREEN}✓${NC} Self-hosted mode: $MCP_URL"
+elif [ -n "$1" ] && [ "$1" = "--self-hosted" ]; then
+  MODE="self-hosted"
+  read -p "  Enter your Trapic server URL (e.g., http://localhost:1888/mcp): " MCP_URL < /dev/tty
+  echo -e "${GREEN}✓${NC} Self-hosted mode: $MCP_URL"
+else
+  echo "  Mode: Cloud (trapic.ai)"
+  echo "  For self-hosted: curl ... | bash -s -- --self-hosted"
+  echo "  Or: TRAPIC_URL=http://localhost:1888/mcp bash install.sh"
+  echo ""
+fi
 
 # ── 1. Token ──────────────────────────────────────────────────────────
 SETTINGS="$HOME/.claude/settings.json"
 mkdir -p "$HOME/.claude"
 
-if [ -n "$TRAPIC_TOKEN" ]; then
-  TOKEN="$TRAPIC_TOKEN"
-  echo -e "${GREEN}✓${NC} Using TRAPIC_TOKEN from environment: ${TOKEN:0:6}..."
-elif [ -f "$SETTINGS" ] && python3 -c "import json; t=json.load(open('$SETTINGS')).get('env',{}).get('TRAPIC_TOKEN',''); exit(0 if t and t!='PASTE_YOUR_TOKEN_HERE' else 1)" 2>/dev/null; then
-  TOKEN=$(python3 -c "import json; print(json.load(open('$SETTINGS')).get('env',{}).get('TRAPIC_TOKEN',''))")
-  echo -e "${GREEN}✓${NC} Found token in settings.json: ${TOKEN:0:6}..."
+if [ "$MODE" = "self-hosted" ]; then
+  # Self-hosted: check if server needs a token
+  echo -e "${YELLOW}!${NC} Checking if your server requires authentication..."
+  HEALTH=$(curl -sf "${MCP_URL%/mcp}/health" 2>/dev/null || echo "")
+  if [ -n "$HEALTH" ]; then
+    echo -e "${GREEN}✓${NC} Server is reachable"
+  else
+    echo -e "${YELLOW}!${NC} Server not reachable at ${MCP_URL%/mcp}/health — make sure it's running"
+  fi
+
+  # Self-hosted might not need a token (open mode)
+  if [ -n "$TRAPIC_TOKEN" ]; then
+    TOKEN="$TRAPIC_TOKEN"
+    echo -e "${GREEN}✓${NC} Using TRAPIC_TOKEN: ${TOKEN:0:6}..."
+  else
+    read -p "  API key (leave empty if server is in open mode): " TOKEN < /dev/tty
+    [ -z "$TOKEN" ] && echo -e "${GREEN}✓${NC} No token — using open mode"
+  fi
 else
-  echo -e "${YELLOW}!${NC} No TRAPIC_TOKEN found."
-  echo ""
-  echo "  Get your token at https://trapic.ai"
-  echo ""
-  read -p "  Paste your token (tr_...): " TOKEN < /dev/tty
-  if [ -z "$TOKEN" ]; then
-    echo "  Skipped. You can add it later to $SETTINGS"
-    TOKEN=""
+  # Cloud mode: token required
+  if [ -n "$TRAPIC_TOKEN" ]; then
+    TOKEN="$TRAPIC_TOKEN"
+    echo -e "${GREEN}✓${NC} Using TRAPIC_TOKEN from environment: ${TOKEN:0:6}..."
+  elif [ -f "$SETTINGS" ] && python3 -c "import json; t=json.load(open('$SETTINGS')).get('env',{}).get('TRAPIC_TOKEN',''); exit(0 if t and t!='PASTE_YOUR_TOKEN_HERE' else 1)" 2>/dev/null; then
+    TOKEN=$(python3 -c "import json; print(json.load(open('$SETTINGS')).get('env',{}).get('TRAPIC_TOKEN',''))")
+    echo -e "${GREEN}✓${NC} Found token in settings.json: ${TOKEN:0:6}..."
+  else
+    echo -e "${YELLOW}!${NC} No TRAPIC_TOKEN found."
+    echo ""
+    echo "  Get your token at https://trapic.ai"
+    echo ""
+    read -p "  Paste your token (tr_...): " TOKEN < /dev/tty
+    if [ -z "$TOKEN" ]; then
+      echo "  Skipped. You can add it later to $SETTINGS"
+      TOKEN=""
+    fi
   fi
 fi
 
@@ -57,29 +98,47 @@ fi
 if [ -f "$MCP_FILE" ] && grep -q "trapic" "$MCP_FILE" 2>/dev/null; then
   echo -e "${GREEN}✓${NC} MCP server already configured in $MCP_FILE"
 else
+  # Build MCP server config based on mode
+  if [ "$MODE" = "self-hosted" ]; then
+    # Self-hosted: use HTTP transport (core supports Streamable HTTP + GET discovery)
+    MCP_TYPE="http"
+    if [ -n "$TOKEN" ]; then
+      MCP_HEADERS="'headers': { 'Authorization': 'Bearer ${TOKEN}' },"
+      MCP_HEADERS_JSON="\"headers\": { \"Authorization\": \"Bearer ${TOKEN}\" },"
+    else
+      MCP_HEADERS=""
+      MCP_HEADERS_JSON=""
+    fi
+  else
+    # Cloud: use http transport (supports OAuth)
+    MCP_TYPE="http"
+    MCP_HEADERS="'headers': { 'Authorization': 'Bearer \${TRAPIC_TOKEN}' },"
+    MCP_HEADERS_JSON="\"headers\": { \"Authorization\": \"Bearer \${TRAPIC_TOKEN}\" },"
+  fi
+
   if [ -f "$MCP_FILE" ]; then
-    # Merge into existing file
     python3 -c "
 import json
 p = '$MCP_FILE'
 d = json.load(open(p))
-d.setdefault('mcpServers', {})['trapic'] = {
-  'type': 'http',
-  'url': 'https://mcp.trapic.ai/mcp',
-  'headers': { 'Authorization': 'Bearer \${TRAPIC_TOKEN}' }
-}
+cfg = { 'type': '${MCP_TYPE}', 'url': '${MCP_URL}' }
+token_str = '${TOKEN}'
+mode = '${MODE}'
+if mode == 'self-hosted' and token_str:
+    cfg['headers'] = { 'Authorization': 'Bearer ' + token_str }
+elif mode == 'cloud':
+    cfg['headers'] = { 'Authorization': 'Bearer \${TRAPIC_TOKEN}' }
+d.setdefault('mcpServers', {})['trapic'] = cfg
 json.dump(d, open(p, 'w'), indent=2)
 " 2>/dev/null
   else
-    cat > "$MCP_FILE" <<'MCPEOF'
+    cat > "$MCP_FILE" <<MCPEOF
 {
   "mcpServers": {
     "trapic": {
-      "type": "http",
-      "url": "https://mcp.trapic.ai/mcp",
-      "headers": {
-        "Authorization": "Bearer ${TRAPIC_TOKEN}"
-      }
+      "type": "${MCP_TYPE}",
+      "url": "${MCP_URL}"$([ -n "$MCP_HEADERS_JSON" ] && echo ",
+      ${MCP_HEADERS_JSON%,}")
     }
   }
 }
