@@ -1,7 +1,7 @@
 {
   "name": "trapic",
-  "version": "0.6.0",
-  "description": "AI long-term memory for coding assistants — auto-recall, knowledge capture, and smart decay",
+  "version": "0.7.0",
+  "description": "Context engineering for AI coding assistants — auto-recall, live refresh, knowledge capture, and smart decay",
   "author": {
     "name": "Trapic",
     "url": "https://trapic.ai"
