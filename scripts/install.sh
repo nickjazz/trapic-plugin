@@ -179,15 +179,15 @@ HOOKEOF
 
   # Add hooks to settings (SessionStart + Stop auto-capture)
   mkdir -p ".claude"
-  STOP_PROMPT='You are a silent knowledge capture agent. Review the conversation above and identify any technical decisions, coding conventions, non-obvious facts/gotchas, project milestones, or user preferences that were discussed or made. For EACH item worth recording, call trapic-create with: content (one sentence), context (why it matters), tags (type + 3 topic tags), scope (project + branch only), confidence. Type: decision|fact|convention|state|preference. Every trace MUST have 3 topic: tags describing the problem area. Before creating a decision/convention, call trapic-search first to check for conflicts. If conflict exists: 1) create new trace with content mentioning the superseded decision e.g. "Use Jotai (supersedes Redux decision)", 2) in context explain the conflict, 3) call trapic-update on old trace with superseded_by. This preserves conflict history in the trace for future recall. If nothing worth recording, do nothing. Work silently, no output.'
+  STOP_PROMPT='You are a silent knowledge capture agent. Review the conversation above and identify any technical decisions, coding conventions, non-obvious facts/gotchas, project milestones, or user preferences that were discussed or made. For EACH item worth recording, call trapic-create with: content (one sentence or markdown), context (why it matters), tags (3 topic: tags + project: tag + branch: tag), confidence, and caused_by (IDs of related traces if applicable). Type should be set via the type parameter: decision|fact|convention|state|preference. Before creating a decision/convention, call trapic-search first to check for conflicts. If conflict exists: 1) create new trace mentioning the superseded decision, 2) call trapic-update on old trace with superseded_by. If nothing worth recording, do nothing. Work silently, no output.'
 
   python3 -c "
 import json, os
 p = '$SETTINGS_LOCAL'
 d = json.load(open(p)) if os.path.exists(p) else {}
 d.setdefault('hooks', {})
-d['hooks']['SessionStart'] = [{'matcher': 'startup', 'hooks': [{'type': 'command', 'command': '\$CLAUDE_PROJECT_DIR/.claude/hooks/trapic-recall.sh', 'timeout': 10}]}]
-d['hooks']['Stop'] = [{'hooks': [{'type': 'agent', 'prompt': '''$STOP_PROMPT''', 'timeout': 30}]}]
+d['hooks']['SessionStart'] = [{'matcher': 'startup|compact|resume', 'hooks': [{'type': 'command', 'command': '\$CLAUDE_PROJECT_DIR/.claude/hooks/trapic-recall.sh', 'timeout': 10}]}]
+d['hooks']['Stop'] = [{'hooks': [{'type': 'agent', 'prompt': '''$STOP_PROMPT''', 'timeout': 60}]}]
 json.dump(d, open(p, 'w'), indent=2)
 " 2>/dev/null
   echo -e "${GREEN}✓${NC} Hooks added to $SETTINGS_LOCAL (SessionStart + Stop auto-capture)"
@@ -244,18 +244,21 @@ You MUST automatically call \`trapic-create\` whenever any of the following happ
 **How to capture:**
 \`\`\`
 trapic-create({
-  content: "One sentence: what was decided/discovered",
+  content: "One sentence or markdown: what was decided/discovered",
   context: "Why this matters or what led to this",
-  tags: ["<type>", "topic:<area-1>", "topic:<area-2>", "topic:<area-3>"],
-  scope: ["project:${PROJECT}", "branch:<current>"],
-  confidence: "high"
+  type: "decision",
+  tags: ["topic:<area-1>", "topic:<area-2>", "topic:<area-3>", "project:${PROJECT}", "branch:<current>"],
+  confidence: "high",
+  caused_by: ["<trace-id-if-related>"]
 })
 \`\`\`
 
-**Tag rules:**
-- First tag = type: \`decision\`, \`fact\`, \`convention\`, \`state\`, or \`preference\`
-- Next 3 tags = \`topic:\` tags describing the problem domain (NOT the technology)
-- Example: choosing Jotai → \`["decision", "topic:state-management", "topic:react", "topic:client-state"]\`
+**Rules:**
+- Use the \`type\` parameter (not in tags): \`decision\`, \`fact\`, \`convention\`, \`state\`, or \`preference\`
+- 3 \`topic:\` tags describing the problem domain (NOT the technology)
+- Always include \`project:\` and \`branch:\` tags
+- Use \`caused_by\` to link related traces (builds reasoning chains)
+- Example: \`type: "decision", tags: ["topic:state-management", "topic:react", "topic:client-state", "project:myapp", "branch:main"]\`
 
 **After creating a trace:** Do NOT announce or summarize it. Silently continue the conversation.
 
