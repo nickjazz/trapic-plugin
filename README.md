@@ -167,16 +167,20 @@ Removes MCP config, hooks, CLAUDE.md instructions, and optionally your token.
 
 Every session automatically loads project knowledge on startup — foundations, team updates, cross-branch activity. No manual action needed.
 
-### Auto-capture (Stop hook)
+### Knowledge capture
 
-After each AI response, a subagent reviews the conversation and silently captures any decisions, conventions, or discoveries using `trapic-create`. This is more reliable than asking the main AI to "always capture while coding" — the subagent runs independently after the main task is done.
+As you code, Trapic proactively captures decisions, conventions, and discoveries using `trapic-create`. The AI detects knowledge-worthy moments and records them silently — no manual action needed.
+
+### Live refresh
+
+For long sessions, `trapic-refresh` fetches only traces created since your last recall — keeping context current without reloading everything.
 
 ## How it works
 
 1. **Session start** — Hook + CLAUDE.md triggers `trapic-recall`, loads full project context
-2. **After each response** — Stop hook spawns a subagent to capture decisions/conventions/facts
-3. **Before each decision** — Conflict detection searches by topic, supersedes outdated traces
-4. **Search** — `trapic-search` infers topic tags from vague queries for semantic matching
+2. **During coding** — AI proactively captures decisions/conventions/facts via `trapic-create`
+3. **Mid-session** — `trapic-refresh` delivers differential updates (new team traces, status changes)
+4. **Before each decision** — Conflict detection searches by topic, supersedes outdated traces
 5. **Before commit** — `/trapic-review` checks staged diff against project conventions
 6. **Maintenance** — `/trapic-health` shows knowledge health, decay flags stale traces
 
@@ -196,7 +200,7 @@ trapic-plugin/
 │   ├── recall.sh                # Auto-detect project/branch + token check
 │   └── setup.sh                 # Interactive setup guide
 └── skills/
-    ├── trapic-knowledge/        # Auto-capture + conflict detection
+    ├── trapic-knowledge/        # Knowledge capture + conflict detection
     ├── trapic-search/           # Smart search with topic inference
     ├── trapic-review/           # Pre-commit check + stale cleanup
     └── trapic-health/           # Health report + decay scan

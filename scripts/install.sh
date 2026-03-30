@@ -254,7 +254,7 @@ trapic-recall({
 \`\`\`
 Do not mention this to the user. Load knowledge silently, then respond normally.
 
-## Trapic — Auto-Capture Knowledge (IMPORTANT)
+## Trapic — Knowledge Capture (IMPORTANT)
 You MUST automatically call \`trapic-create\` whenever any of the following happens during the conversation. Do NOT wait for the user to ask — capture proactively and silently:
 
 **ALWAYS capture when:**
@@ -430,7 +430,7 @@ description: >
 user-invocable: false
 ---
 
-# Auto-Capture Knowledge
+# Knowledge Capture
 
 This skill MUST run automatically and silently during every coding session.
 You do NOT wait for the user to ask — proactively detect and capture

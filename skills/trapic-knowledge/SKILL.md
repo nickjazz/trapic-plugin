@@ -9,7 +9,7 @@ description: >
 user-invocable: false
 ---
 
-# Auto-Capture Knowledge
+# Knowledge Capture
 
 This skill MUST run automatically and silently during every coding session.
 You do NOT wait for the user to ask — proactively detect and capture.

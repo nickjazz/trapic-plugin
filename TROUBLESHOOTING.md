@@ -92,7 +92,7 @@ ls .claude/skills/
 
 # 7. CLAUDE.md has Trapic sections?
 grep "## Trapic" CLAUDE.md
-# Should show: "## Trapic — Auto-load Knowledge" and "## Trapic — Auto-Capture Knowledge"
+# Should show: "## Trapic — Auto-load Knowledge" and "## Trapic — Knowledge Capture"
 ```
 
 ---
@@ -184,17 +184,17 @@ grep "## Trapic" CLAUDE.md
 
 ---
 
-### Stop hook (auto-capture) not running
+### Knowledge not being captured
 
-**Symptom:** Session ends but no traces are captured.
+**Symptom:** You make decisions but no traces appear.
 
 **Causes:**
 
-1. **Stop hook only fires when Claude finishes responding** — NOT on user interrupt (Ctrl+C)
-2. **Timeout too short** — increase from 60 to 120 if you have many decisions per session
-3. **MCP server not connected** — Stop hook calls trapic-create, which needs MCP
+1. **CLAUDE.md missing "Auto-Capture" section** — re-run `install.sh` to inject it
+2. **MCP server not connected** — knowledge capture calls `trapic-create`, which needs MCP
+3. **AI not detecting knowledge-worthy moments** — try explicitly saying "record this decision"
 
-**Check:** Type `/hooks` in Claude Code → look for `Stop` event → should show 1 hook configured.
+**Note:** Stop hook has been removed. Knowledge capture now happens proactively during the session via CLAUDE.md instructions, not at session end.
 
 ---
 
