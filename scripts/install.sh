@@ -183,9 +183,8 @@ HOOKEOF
   chmod +x "$HOOK_SCRIPT"
   echo -e "${GREEN}✓${NC} Hook script created at $HOOK_SCRIPT"
 
-  # Add hooks to settings (SessionStart + Stop auto-capture)
+  # Add SessionStart hook to settings (Stop hook removed — use trapic-refresh instead)
   mkdir -p ".claude"
-  STOP_PROMPT='You are a silent knowledge capture agent. Review the conversation above and identify any technical decisions, coding conventions, non-obvious facts/gotchas, project milestones, or user preferences that were discussed or made. For EACH item worth recording, call trapic-create with: content (one sentence or markdown), context (why it matters), tags (3 topic: tags + project: tag + branch: tag), confidence, and caused_by (IDs of related traces if applicable). Type should be set via the type parameter: decision|fact|convention|state|preference. Before creating a decision/convention, call trapic-search first to check for conflicts. If conflict exists: 1) create new trace mentioning the superseded decision, 2) call trapic-update on old trace with superseded_by. If nothing worth recording, do nothing. Work silently, no output.'
 
   python3 -c "
 import json, os, sys
@@ -196,20 +195,20 @@ except:
     d = {}
 d.setdefault('hooks', {})
 d['hooks']['SessionStart'] = [{'matcher': 'startup|compact|resume', 'hooks': [{'type': 'command', 'command': '\$CLAUDE_PROJECT_DIR/.claude/hooks/trapic-recall.sh', 'timeout': 10}]}]
-d['hooks']['Stop'] = [{'hooks': [{'type': 'agent', 'prompt': '''$STOP_PROMPT''', 'timeout': 60}]}]
+# Remove legacy Stop hook if present
+d['hooks'].pop('Stop', None)
 json.dump(d, open(p, 'w'), indent=2)
 print('ok')
 "
   if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓${NC} Hooks added to $SETTINGS_LOCAL (SessionStart + Stop auto-capture)"
+    echo -e "${GREEN}✓${NC} Hooks added to $SETTINGS_LOCAL (SessionStart auto-recall)"
   else
     echo -e "${YELLOW}!${NC} Failed to write hooks to $SETTINGS_LOCAL — check python3 is installed"
     # Fallback: write JSON directly
     cat > "$SETTINGS_LOCAL" <<HOOKSEOF
 {
   "hooks": {
-    "SessionStart": [{"matcher": "startup|compact|resume", "hooks": [{"type": "command", "command": "\$CLAUDE_PROJECT_DIR/.claude/hooks/trapic-recall.sh", "timeout": 10}]}],
-    "Stop": [{"hooks": [{"type": "agent", "prompt": "$STOP_PROMPT", "timeout": 60}]}]
+    "SessionStart": [{"matcher": "startup|compact|resume", "hooks": [{"type": "command", "command": "\$CLAUDE_PROJECT_DIR/.claude/hooks/trapic-recall.sh", "timeout": 10}]}]
   }
 }
 HOOKSEOF
@@ -451,21 +450,28 @@ knowledge as it happens.
 trapic-create({
   content: "One sentence: what was decided/discovered",
   context: "Why this matters",
-  tags: ["<type>", "topic:<area-1>", "topic:<area-2>", "topic:<area-3>"],
-  scope: ["project:<name>", "branch:<branch>"],
+  type: "decision",
+  tags: ["topic:<area-1>", "topic:<area-2>", "topic:<area-3>", "project:<name>", "branch:<branch>"],
   confidence: "high"
 })
 ```
 
 ## Tag rules:
-- First tag = type: `decision`, `fact`, `convention`, `state`, or `preference`
-- Next 3 tags = `topic:` tags describing the problem domain (NOT the technology)
+- Use the `type` parameter (NOT in tags): `decision`, `fact`, `convention`, `state`, `preference`
+- 3 `topic:` tags describing the problem domain
+- `project:` and `branch:` tags for scope
 
 ## Conflict Detection
 Before creating a `decision` or `convention`:
-1. `trapic-search({ types: ["decision", "convention"], tags: ["topic:<relevant>"], scope: ["project:<name>"], limit: 10 })`
+1. `trapic-search({ types: ["decision", "convention"], tags: ["topic:<relevant>", "project:<name>"], limit: 10 })`
 2. Conflict (same question, different answer) → create new + `trapic-update({ trace_id: "<old>", superseded_by: "<new>" })`
 3. No conflict → just create
+
+## Mid-session Refresh
+For long sessions, call `trapic-refresh` periodically to get updates:
+```
+trapic-refresh({ since: "<last_recall_timestamp>", scope: ["project:<name>", "branch:<branch>"] })
+```
 
 ## Silent Operation
 After creating a trace, do NOT announce or summarize it. Silently continue.
