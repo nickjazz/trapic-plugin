@@ -417,7 +417,7 @@ trapic-search({
 3. Report summary to user
 SKILLEOF
 
-  # trapic-knowledge skill (auto-capture, not user-invocable)
+  # trapic-knowledge skill (knowledge capture, not user-invocable)
   mkdir -p "$SKILLS_DIR/trapic-knowledge"
   cat > "$SKILLS_DIR/trapic-knowledge/SKILL.md" <<'SKILLEOF'
 ---
