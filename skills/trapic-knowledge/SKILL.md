@@ -39,9 +39,17 @@ trapic-create({
   context: "Why this matters (in English)",
   type: "decision",
   tags: ["topic:<area-1>", "topic:<area-2>", "topic:<area-3>", "project:<name>", "branch:<branch>"],
-  confidence: "high"
+  confidence: "high",
+  visibility: "public"
 })
 ```
+
+## Visibility:
+- `"public"` (default) — all team members can see
+- `"private"` — only the author can see (auto-set if any `private:` tag is present)
+- `"team"` — only specific team members can see
+
+Traces with `private:` prefix tags are automatically set to `visibility: "private"` even if you don't set it explicitly.
 
 ## Rules:
 - **Content MUST be in English** — even if conversation is in another language
