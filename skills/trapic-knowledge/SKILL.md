@@ -33,14 +33,19 @@ You do NOT wait for the user to ask — proactively detect and capture.
 
 ## Team Session Flow
 
-At **session start**, call `trapic-recall` or `trapic-my-teams` to detect user's teams:
-- **0 teams** → all traces are private
-- **1 team** → auto-selected, remember `team_id` for this session
-- **2+ teams** → ask user which team, remember their choice
+## Team Session Flow (MANDATORY — do NOT skip)
+
+After calling `trapic-recall`, CHECK the response for "Team Selection Required". This is NOT optional metadata — you MUST act on it:
+
+- **0 teams** → tell user: "No teams found. All traces will be private."
+- **1 team** → tell user: "All knowledge will be recorded in **{team_name}**."
+- **2+ teams** → STOP and ASK the user: "You have N teams: {list names}. Which one should I record in for this session?" WAIT for their answer before doing anything else.
 
 Once you know `team_id`, pass it to ALL subsequent `trapic-create`, `trapic-recall`, and `trapic-refresh` calls. Do NOT ask again in the same session.
 
-**Response style**: After user picks a team, confirm with just the team NAME: "Got it, all knowledge in this session will be recorded in **{team_name}**." Do NOT show team_id or UUIDs to the user — those are for machine use only.
+**CRITICAL**: Do NOT summarize or skip the team selection prompt. Do NOT proceed with work until the user has chosen a team (when 2+ teams exist).
+
+**Response style**: Show team NAMES only. Never show UUIDs to the user.
 
 ## How to capture:
 
