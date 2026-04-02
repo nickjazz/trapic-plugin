@@ -85,13 +85,15 @@ Traces with `private:` prefix tags are automatically set to `visibility: "privat
 
 ## Topic Tags
 
-Topics describe the **problem area**, not the technology:
+Topics describe the **problem area / domain**, never the specific technology:
 
-| Technology choice | Topic tags |
-|-------------------|------------|
-| Redux / Jotai / Zustand | `topic:state-management`, `topic:react`, `topic:client-state` |
-| Next.js / Vite | `topic:framework`, `topic:ssr`, `topic:bundler` |
+| Specific technology | Correct topic tags |
+|--------------------|-------------------|
+| Redux / Jotai / Zustand | `topic:state-management`, `topic:frontend`, `topic:architecture` |
+| Next.js / Vite | `topic:framework`, `topic:build-system`, `topic:infrastructure` |
 | Redis / In-memory | `topic:caching`, `topic:performance`, `topic:infrastructure` |
+| Stripe / PayPal | `topic:finance`, `topic:payments`, `topic:commerce` |
+| PostgreSQL / Supabase | `topic:database`, `topic:infrastructure`, `topic:backend` |
 
 ## Standardized Tag Vocabulary
 
