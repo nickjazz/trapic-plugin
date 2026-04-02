@@ -95,27 +95,55 @@ Topics describe the **problem area / domain**, never the specific technology:
 | Stripe / PayPal | `topic:finance`, `topic:payments`, `topic:commerce` |
 | PostgreSQL / Supabase | `topic:database`, `topic:infrastructure`, `topic:backend` |
 
-## Standardized Tag Vocabulary
+## Tag Rules
 
-Tags MUST describe **category/domain**, not specific objects or names.
+Every trace MUST have at least 1 **domain tag** (broad category). May optionally add **specific tags** for well-known terms.
 
-**Standard categories:**
-`medical`, `finance`, `legal`, `education`, `technology`, `cooking`, `travel`, `fitness`,
-`entertainment`, `shopping`, `home-improvement`, `career`, `relationships`, `automotive`,
-`pets`, `gardening`, `music`, `art`, `gaming`, `sports`
+### Domain tags (REQUIRED — at least 1 per trace)
 
-**NEVER use proper nouns as tags:**
-- NOT `topic:dr-patel`, `topic:stripe`, `topic:react` ← these are specific names/products
-- NOT `topic:supabase`, `topic:claude`, `topic:vite` ← these are product names
+**Business & Finance:**
+`finance`, `payments`, `accounting`, `investing`, `insurance`, `banking`, `commerce`, `pricing`, `taxation`
 
-**Tags answer "what domain is this about?" not "what specific thing is mentioned?"**
+**Technology & Engineering:**
+`frontend`, `backend`, `database`, `infrastructure`, `devops`, `api`, `security`, `networking`, `cloud`, `mobile`, `ai`, `machine-learning`, `data-engineering`
 
-| Wrong (specific) | Correct (domain) |
-|------------------|------------------|
-| `topic:stripe` | `topic:finance`, `topic:payments` |
-| `topic:supabase` | `topic:database`, `topic:infrastructure` |
-| `topic:react` | `topic:technology`, `topic:framework` |
-| `topic:dr-patel` | `topic:medical` |
+**Science & Health:**
+`medical`, `mental-health`, `nutrition`, `fitness`, `biology`, `chemistry`, `physics`, `environmental`
+
+**Creative & Media:**
+`design`, `photography`, `video`, `music`, `art`, `writing`, `animation`, `branding`
+
+**Law & Governance:**
+`legal`, `compliance`, `privacy`, `intellectual-property`, `regulation`, `contracts`
+
+**Education & Career:**
+`education`, `career`, `hiring`, `management`, `leadership`, `productivity`, `training`
+
+**Lifestyle:**
+`cooking`, `travel`, `automotive`, `home-improvement`, `gardening`, `pets`, `parenting`, `relationships`
+
+**Commerce & Marketing:**
+`marketing`, `seo`, `content-strategy`, `advertising`, `analytics`, `social-media`, `email-marketing`
+
+**Entertainment:**
+`gaming`, `sports`, `entertainment`, `streaming`, `books`, `podcasts`
+
+**Operations:**
+`project-management`, `logistics`, `supply-chain`, `customer-support`, `quality-assurance`
+
+### Specific tags (OPTIONAL — well-known terms OK)
+
+Well-known frameworks, products, or terms can be added AS EXTRA tags, never as the ONLY tag:
+
+```
+✅ tags: ["topic:payments", "topic:commerce", "topic:stripe"]
+         ↑ domain (required)  ↑ domain        ↑ specific (optional, Stripe is well-known)
+
+✅ tags: ["topic:frontend", "topic:framework", "topic:react"]
+
+❌ tags: ["topic:stripe"]  ← missing domain tag
+❌ tags: ["topic:dr-patel"] ← not well-known, use "topic:medical" instead
+```
 
 ## Conflict Detection
 
