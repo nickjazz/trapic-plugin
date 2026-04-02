@@ -95,83 +95,46 @@ Topics describe the **problem area / domain**, never the specific technology:
 | Stripe / PayPal | `topic:finance`, `topic:payments`, `topic:commerce` |
 | PostgreSQL / Supabase | `topic:database`, `topic:infrastructure`, `topic:backend` |
 
-## Tag Rules (based on IAB Content Taxonomy v3)
+## Tag Rules (IAB Content Taxonomy v3 + Trapic Extensions)
 
-Every trace MUST have at least 1 **domain tag** (broad category). May optionally add **specific tags** for well-known terms.
+Every trace MUST have at least 1 **domain tag**. May optionally add **specific tags** for well-known terms.
 
-### Domain tags (REQUIRED — at least 1 per trace)
+### 4-Tier Tag System (maps to Palace depth)
 
-Based on [IAB Content Taxonomy v3](https://github.com/InteractiveAdvertisingBureau/Taxonomies) + technology extensions.
+Based on [IAB Content Taxonomy v3](https://github.com/InteractiveAdvertisingBureau/Taxonomies) — 703 standard categories + 20 Trapic technology extensions.
 
-**Business & Finance:**
-`business`, `finance`, `payments`, `accounting`, `investing`, `insurance`, `banking`, `commerce`, `pricing`, `personal-finance`, `real-estate`
+| Tier | Count | Depth | Example |
+|------|-------|-------|---------|
+| 1 | 36 | Broadest domain | `topic:technology-and-computing` |
+| 2 | 322 | Sub-domain | `topic:artificial-intelligence` |
+| 3 | 275 | Specific area | `topic:machine-learning` |
+| 4 | 70+ | Most specific | `topic:natural-language-processing` |
 
-**Technology & Computing:**
-`technology`, `computing`, `ai`, `machine-learning`, `frontend`, `backend`, `database`, `infrastructure`, `devops`, `api`, `security`, `networking`, `cloud`, `mobile`, `robotics`, `data-engineering`, `virtual-reality`, `augmented-reality`
+**Use the most specific tier that applies. Always include at least 1 Tier 1 or Tier 2 for broad searchability.**
 
-**Science & Health:**
-`science`, `medical`, `mental-health`, `nutrition`, `fitness`, `wellness`, `biology`, `chemistry`, `physics`, `environmental`, `genetics`, `space`
+### Full taxonomy reference files
+- `references/iab-taxonomy-v3.tsv` — 703 IAB categories (Tier 1-4)
+- `references/trapic-tech-extension.tsv` — 20 additional dev/engineering categories
 
-**Education & Career:**
-`education`, `career`, `job-search`, `remote-working`, `online-education`, `language-learning`, `training`, `vocational`
+### Common Tier 1 domains (25 most used, kebab-case)
+`automotive`, `books-and-literature`, `business-and-finance`, `careers`, `education`, `entertainment`, `family-and-relationships`, `fine-art`, `food-and-drink`, `healthy-living`, `hobbies-and-interests`, `home-and-garden`, `law`, `medical-health`, `personal-finance`, `pets`, `politics`, `real-estate`, `religion-and-spirituality`, `science`, `shopping`, `sports`, `style-and-fashion`, `technology-and-computing`, `travel`
 
-**Law & Politics:**
-`legal`, `compliance`, `privacy`, `regulation`, `contracts`, `politics`, `elections`, `policy`
+### Trapic Technology Extensions (Tier 2-4)
+`software-engineering`, `frontend`, `backend`, `database`, `api-design`, `devops`, `security-engineering`, `cloud-infrastructure`, `data-engineering`, `machine-learning`, `nlp`, `computer-vision`, `llm-and-agents`, `blockchain`, `cybersecurity`, `developer-tools`, `open-source`, `networking`, `testing-and-qa`, `mobile-development`
 
-**Creative & Fine Art:**
-`design`, `photography`, `video`, `music`, `art`, `writing`, `animation`, `digital-arts`, `branding`
+### Specific tags (OPTIONAL)
 
-**Food & Drink:**
-`cooking`, `dining`, `baking`, `beverages`, `healthy-eating`, `world-cuisines`
-
-**Home & Garden:**
-`home-improvement`, `gardening`, `interior-decorating`, `landscaping`, `smart-home`, `home-security`
-
-**Travel & Automotive:**
-`travel`, `automotive`, `auto-repair`, `auto-technology`, `road-trips`
-
-**Family & Relationships:**
-`parenting`, `dating`, `marriage`, `eldercare`, `relationships`
-
-**Shopping & Commerce:**
-`shopping`, `coupons`, `gifts`, `grocery`
-
-**Marketing & Advertising:**
-`marketing`, `seo`, `content-strategy`, `advertising`, `analytics`, `social-media`, `email-marketing`
-
-**Entertainment & Media:**
-`entertainment`, `movies`, `television`, `gaming`, `esports`, `streaming`, `books`, `podcasts`, `pop-culture`
-
-**Sports & Fitness:**
-`sports`, `soccer`, `basketball`, `tennis`, `martial-arts`, `cycling`, `swimming`, `golf`
-
-**Pets & Animals:**
-`pets`, `dogs`, `cats`, `veterinary`
-
-**Hobbies & Interests:**
-`crafts`, `collecting`, `puzzles`, `musical-instruments`, `workshops`
-
-**Style & Fashion:**
-`fashion`, `beauty`, `personal-care`
-
-**Operations & Management:**
-`project-management`, `logistics`, `supply-chain`, `customer-support`, `quality-assurance`, `hiring`, `leadership`, `productivity`
-
-**Religion & Spirituality:**
-`religion`, `spirituality`, `philosophy`
-
-### Specific tags (OPTIONAL — well-known terms OK)
-
-Well-known frameworks, products, or terms can be added AS EXTRA tags, never as the ONLY tag:
+Well-known terms can be added as EXTRA tags, never as the ONLY tag:
 
 ```
-✅ tags: ["topic:payments", "topic:commerce", "topic:stripe"]
-         ↑ domain (required)  ↑ domain        ↑ specific (optional, well-known)
+✅ tags: ["topic:personal-finance", "topic:investing", "topic:stripe"]
+         ↑ Tier 1 domain        ↑ Tier 2          ↑ specific (well-known)
 
-✅ tags: ["topic:frontend", "topic:technology", "topic:react"]
+✅ tags: ["topic:technology-and-computing", "topic:frontend", "topic:react"]
+         ↑ Tier 1                          ↑ Tier 2 ext     ↑ specific
 
 ❌ tags: ["topic:stripe"]  ← missing domain tag
-❌ tags: ["topic:dr-patel"] ← not well-known, use "topic:medical" instead
+❌ tags: ["topic:dr-patel"] ← not well-known, not in taxonomy
 ```
 
 ## Conflict Detection

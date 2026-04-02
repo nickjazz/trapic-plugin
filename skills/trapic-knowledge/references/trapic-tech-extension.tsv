@@ -1,0 +1,21 @@
+Unique ID	Parent	Name	Tier 1	Tier 2	Tier 3	Tier 4
+T001		Software Engineering	Technology & Computing	Software Engineering
+T002	T001	Frontend Development	Technology & Computing	Software Engineering	Frontend Development
+T003	T001	Backend Development	Technology & Computing	Software Engineering	Backend Development
+T004	T001	Database	Technology & Computing	Software Engineering	Database
+T005	T001	API Design	Technology & Computing	Software Engineering	API Design
+T006	T001	DevOps	Technology & Computing	Software Engineering	DevOps
+T007	T001	Security Engineering	Technology & Computing	Software Engineering	Security Engineering
+T008	T001	Mobile Development	Technology & Computing	Software Engineering	Mobile Development
+T009	T001	Cloud Infrastructure	Technology & Computing	Software Engineering	Cloud Infrastructure
+T010	T001	Data Engineering	Technology & Computing	Software Engineering	Data Engineering
+T011	T001	Testing & QA	Technology & Computing	Software Engineering	Testing & QA
+T012		Networking	Technology & Computing	Networking
+T013		Blockchain	Technology & Computing	Blockchain
+T014		Cybersecurity	Technology & Computing	Cybersecurity
+T015		Machine Learning	Technology & Computing	Artificial Intelligence	Machine Learning
+T016		Natural Language Processing	Technology & Computing	Artificial Intelligence	Natural Language Processing
+T017		Computer Vision	Technology & Computing	Artificial Intelligence	Computer Vision
+T018		LLM & Agents	Technology & Computing	Artificial Intelligence	LLM & Agents
+T019		Open Source	Technology & Computing	Open Source
+T020		Developer Tools	Technology & Computing	Developer Tools
