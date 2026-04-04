@@ -1,6 +1,6 @@
 # Trapic — AIコーディングアシスタントの長期記憶
 
-[![Version](https://img.shields.io/badge/version-0.6.0-blue)](https://github.com/nickjazz/trapic-plugin) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
+[![Version](https://img.shields.io/badge/version-0.6.0-blue)](https://github.com/trapicAi/trapic-plugin) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 
 [English](./README.md) | [繁體中文](./README.zh-TW.md) | [日本語](./README.ja.md)
 
@@ -31,7 +31,7 @@ AIアシスタントはセッション開始と同時にプロジェクト知識
 最も安定したセットアップ方法。プロジェクトルートから実行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/install.sh | bash
 ```
 
 すべてを一度にセットアップ：
@@ -43,8 +43,8 @@ curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts
 ### オプション B：プラグイン
 
 ```bash
-/plugin marketplace add nickjazz/trapic-plugin
-/plugin install trapic@nickjazz-trapic-plugin
+/plugin marketplace add trapicAi/trapic-plugin
+/plugin install trapic@trapicAi-trapic-plugin --scope user
 ```
 
 > **Claude Codeのプラグインシステムについて：** マーケットプレイスはまだ若いです。Hookが発火しないことがあり、環境変数は手動設定が必要で、エラーメッセージは暗号的です（「Duplicate hooks file detected」— ありがとう、Anthropic）。プラグインインストールは動きますが、問題が発生したらオプションAが実戦テスト済みです。
@@ -129,7 +129,7 @@ EOF
 ### アンインストール
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/uninstall.sh | bash
 ```
 
 MCP設定、hook、CLAUDE.md指示を削除。トークンは選択的に削除可能。

@@ -13,7 +13,7 @@
       "name": "trapic",
       "source": {
         "source": "github",
-        "repo": "nickjazz/trapic-plugin",
+        "repo": "trapicAi/trapic-plugin",
         "ref": "main"
       },
       "description": "AI long-term memory — auto-recall project knowledge, capture decisions with conflict detection, smart decay for stale knowledge",
@@ -23,7 +23,7 @@
         "email": "hello.trapic@gmail.com"
       },
       "homepage": "https://trapic.ai",
-      "repository": "https://github.com/nickjazz/trapic-plugin",
+      "repository": "https://github.com/trapicAi/trapic-plugin",
       "license": "MIT",
       "keywords": ["memory", "knowledge", "mcp", "recall", "trapic", "context", "decisions"],
       "category": "productivity"

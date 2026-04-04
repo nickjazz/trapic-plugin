@@ -5,7 +5,7 @@
 Run the install script from your **project root** (where `.git/` is):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/install.sh | bash
 ```
 
 ### Project-level files (in your project root)
@@ -227,8 +227,8 @@ chmod +x .claude/hooks/trapic-recall.sh
 If you use Claude Code in multiple projects, each project needs its own install:
 
 ```bash
-cd ~/project-a && curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/install.sh | bash
-cd ~/project-b && curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/install.sh | bash
+cd ~/project-a && curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/install.sh | bash
+cd ~/project-b && curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/install.sh | bash
 ```
 
 The token (`~/.claude/settings.json`) is shared globally — only set it once.
@@ -240,7 +240,7 @@ The token (`~/.claude/settings.json`) is shared globally — only set it once.
 If using self-hosted trapic-core instead of trapic.ai:
 
 ```bash
-TRAPIC_URL=http://localhost:3000/mcp curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/install.sh | bash -s -- --self-hosted
+TRAPIC_URL=http://localhost:3000/mcp curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/install.sh | bash -s -- --self-hosted
 ```
 
 The only difference: `.mcp.json` points to your local server instead of `mcp.trapic.ai`.
@@ -252,4 +252,4 @@ The only difference: `.mcp.json` points to your local server instead of `mcp.tra
 1. Toggle verbose mode in Claude Code: `Ctrl+O` — shows hook execution details
 2. Check `/hooks` menu in Claude Code — lists all configured hooks
 3. Run `claude doctor` — checks MCP server connectivity
-4. Open an issue: https://github.com/nickjazz/trapic-plugin/issues
+4. Open an issue: https://github.com/trapicAi/trapic-plugin/issues

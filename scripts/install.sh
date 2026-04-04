@@ -1,17 +1,35 @@
 #!/bin/bash
 # Trapic one-click manual install — MCP server + SessionStart hook
-# Usage: curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/install.sh | bash
 
 set -e
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m'
 
 echo ""
 echo -e "${BLUE}=== Trapic Install ===${NC}"
 echo ""
+
+# ── Detect existing plugin installation ──────────────────────────────
+PLUGIN_INSTALLED=false
+if ls .claude/plugins/*/trapic* 1>/dev/null 2>&1; then
+  PLUGIN_INSTALLED=true
+elif [ -f ".claude/settings.json" ] && grep -q '"trapic"' .claude/settings.json 2>/dev/null && grep -q '"plugins"' .claude/settings.json 2>/dev/null; then
+  PLUGIN_INSTALLED=true
+elif ls "$HOME/.claude/plugins/*/trapic*" 1>/dev/null 2>&1; then
+  PLUGIN_INSTALLED=true
+fi
+
+if [ "$PLUGIN_INSTALLED" = true ]; then
+  echo -e "${GREEN}✓${NC} Trapic plugin detected."
+  echo "  The plugin already provides MCP config, hooks, and skills."
+  echo "  This script will only set up the token (if needed)."
+  echo ""
+fi
 
 # ── 0. Mode selection ─────────────────────────────────────────────────
 # Detect mode: cloud (default) or self-hosted
@@ -89,35 +107,34 @@ json.dump(d, open(p, 'w'), indent=2)
 fi
 
 # ── 2. MCP server ────────────────────────────────────────────────────
-# Check project-level .mcp.json first, then user-level ~/.claude.json
-MCP_FILE=".mcp.json"
-if [ ! -d ".git" ]; then
-  MCP_FILE="$HOME/.claude.json"
-fi
-
-if [ -f "$MCP_FILE" ] && grep -q "trapic" "$MCP_FILE" 2>/dev/null; then
-  echo -e "${GREEN}✓${NC} MCP server already configured in $MCP_FILE"
+# Skip MCP config if plugin is already installed (avoids duplicate connections)
+if [ "$PLUGIN_INSTALLED" = true ]; then
+  echo -e "${GREEN}✓${NC} Trapic plugin detected. Skipping MCP config (plugin handles it)."
 else
-  # Build MCP server config based on mode
-  if [ "$MODE" = "self-hosted" ]; then
-    # Self-hosted: use HTTP transport (core supports Streamable HTTP + GET discovery)
-    MCP_TYPE="http"
-    if [ -n "$TOKEN" ]; then
-      MCP_HEADERS="'headers': { 'Authorization': 'Bearer ${TOKEN}' },"
-      MCP_HEADERS_JSON="\"headers\": { \"Authorization\": \"Bearer ${TOKEN}\" },"
-    else
-      MCP_HEADERS=""
-      MCP_HEADERS_JSON=""
-    fi
-  else
-    # Cloud: use http transport (supports OAuth)
-    MCP_TYPE="http"
-    MCP_HEADERS="'headers': { 'Authorization': 'Bearer \${TRAPIC_TOKEN}' },"
-    MCP_HEADERS_JSON="\"headers\": { \"Authorization\": \"Bearer \${TRAPIC_TOKEN}\" },"
+  # Check project-level .mcp.json first, then user-level ~/.claude.json
+  MCP_FILE=".mcp.json"
+  if [ ! -d ".git" ]; then
+    MCP_FILE="$HOME/.claude.json"
   fi
 
-  if [ -f "$MCP_FILE" ]; then
-    python3 -c "
+  if [ -f "$MCP_FILE" ] && grep -q "trapic" "$MCP_FILE" 2>/dev/null; then
+    echo -e "${GREEN}✓${NC} MCP server already configured in $MCP_FILE"
+  else
+    # Build MCP server config based on mode
+    if [ "$MODE" = "self-hosted" ]; then
+      MCP_TYPE="http"
+      if [ -n "$TOKEN" ]; then
+        MCP_HEADERS_JSON="\"headers\": { \"Authorization\": \"Bearer ${TOKEN}\" },"
+      else
+        MCP_HEADERS_JSON=""
+      fi
+    else
+      MCP_TYPE="http"
+      MCP_HEADERS_JSON="\"headers\": { \"Authorization\": \"Bearer \${TRAPIC_TOKEN}\" },"
+    fi
+
+    if [ -f "$MCP_FILE" ]; then
+      python3 -c "
 import json
 p = '$MCP_FILE'
 d = json.load(open(p))
@@ -131,8 +148,8 @@ elif mode == 'cloud':
 d.setdefault('mcpServers', {})['trapic'] = cfg
 json.dump(d, open(p, 'w'), indent=2)
 " 2>/dev/null
-  else
-    cat > "$MCP_FILE" <<MCPEOF
+    else
+      cat > "$MCP_FILE" <<MCPEOF
 {
   "mcpServers": {
     "trapic": {
@@ -143,8 +160,9 @@ json.dump(d, open(p, 'w'), indent=2)
   }
 }
 MCPEOF
+    fi
+    echo -e "${GREEN}✓${NC} MCP server added to $MCP_FILE"
   fi
-  echo -e "${GREEN}✓${NC} MCP server added to $MCP_FILE"
 fi
 
 # ── 3. SessionStart hook ─────────────────────────────────────────────
@@ -152,8 +170,10 @@ HOOK_DIR=".claude/hooks"
 HOOK_SCRIPT="$HOOK_DIR/trapic-recall.sh"
 SETTINGS_LOCAL=".claude/settings.json"
 
-# Only add hooks if we're in a git repo (project-level)
-if [ -d ".git" ]; then
+# Skip hooks if plugin is already installed (avoids triple recall)
+if [ "$PLUGIN_INSTALLED" = true ]; then
+  echo -e "${GREEN}✓${NC} Trapic plugin detected. Skipping hook setup (plugin handles recall)."
+elif [ -d ".git" ]; then
   mkdir -p "$HOOK_DIR"
 
   # Write hook script
@@ -220,7 +240,10 @@ else
 fi
 
 # ── 4. CLAUDE.md — inject/update Trapic instructions ─────────────────
-if [ -d ".git" ]; then
+# Skip CLAUDE.md if plugin is already installed (plugin skills handle recall + capture)
+if [ "$PLUGIN_INSTALLED" = true ]; then
+  echo -e "${GREEN}✓${NC} Trapic plugin detected. Skipping CLAUDE.md injection (plugin skills handle it)."
+elif [ -d ".git" ]; then
   PROJECT=$(git remote get-url origin 2>/dev/null | sed 's|.*/||;s|\.git$||')
   [ -z "$PROJECT" ] && PROJECT=$(basename "$(pwd)")
 
@@ -297,7 +320,10 @@ else
 fi
 
 # ── 5. Skills — install to .claude/skills/ ────────────────────────────
-if [ -d ".git" ]; then
+# Skip skills if plugin is already installed (plugin provides its own skills)
+if [ "$PLUGIN_INSTALLED" = true ]; then
+  echo -e "${GREEN}✓${NC} Trapic plugin detected. Skipping skills install (plugin provides them)."
+elif [ -d ".git" ]; then
   SKILLS_DIR=".claude/skills"
   mkdir -p "$SKILLS_DIR"
 
@@ -480,6 +506,22 @@ SKILLEOF
   echo -e "${GREEN}✓${NC} Skills installed to $SKILLS_DIR/ (trapic-knowledge, trapic-search, trapic-health, trapic-review)"
 else
   echo -e "${YELLOW}!${NC} Not in a git repo — skipping skills installation"
+fi
+
+# ── 6. Verify token ──────────────────────────────────────────────────
+if [ -n "$TOKEN" ] && [ "$MODE" = "cloud" ]; then
+  echo ""
+  echo -e "${BLUE}Verifying token...${NC}"
+  HEALTH_RESP=$(curl -sf -H "Authorization: Bearer $TOKEN" "https://mcp.trapic.ai/health" 2>/dev/null || echo "")
+  if [ -n "$HEALTH_RESP" ]; then
+    echo -e "${GREEN}✓${NC} Token verified — connection to trapic.ai is working."
+  else
+    echo -e "${YELLOW}!${NC} Could not verify token. The token may still be valid — check after restarting Claude Code."
+  fi
+elif [ -z "$TOKEN" ] && [ "$MODE" = "cloud" ]; then
+  echo ""
+  echo -e "${YELLOW}!${NC} No token configured. To set up later, run:"
+  echo "    bash <(curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/setup.sh)"
 fi
 
 # ── Done ──────────────────────────────────────────────────────────────

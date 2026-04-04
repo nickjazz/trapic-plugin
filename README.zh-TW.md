@@ -1,6 +1,6 @@
 # Trapic — AI 程式助手的長期記憶
 
-[![Version](https://img.shields.io/badge/version-0.6.0-blue)](https://github.com/nickjazz/trapic-plugin) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
+[![Version](https://img.shields.io/badge/version-0.6.0-blue)](https://github.com/trapicAi/trapic-plugin) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 
 [English](./README.md) | [繁體中文](./README.zh-TW.md) | [日本語](./README.ja.md)
 
@@ -31,7 +31,7 @@ AI 助手在 session 開始的瞬間載入專案知識 — 團隊決策、程式
 最穩定的安裝方式。在專案根目錄執行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/install.sh | bash
 ```
 
 一次搞定所有設定：
@@ -43,8 +43,8 @@ curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts
 ### 方式 B：Plugin 安裝
 
 ```bash
-/plugin marketplace add nickjazz/trapic-plugin
-/plugin install trapic@nickjazz-trapic-plugin
+/plugin marketplace add trapicAi/trapic-plugin
+/plugin install trapic@trapicAi-trapic-plugin --scope user
 ```
 
 > **關於 Claude Code 的 plugin 系統：** Marketplace 還很年輕。Hook 有時不觸發、環境變數要手動設定、錯誤訊息讓人摸不著頭緒（「Duplicate hooks file detected」— 謝了 Anthropic）。Plugin 安裝是能用的，但如果遇到問題，方式 A 是久經考驗的選擇。我們已經回報了不少 feedback，希望會改善。
@@ -129,7 +129,7 @@ EOF
 ### 解除安裝
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/uninstall.sh | bash
 ```
 
 移除 MCP 設定、hook、CLAUDE.md 指示，token 可選擇是否移除。

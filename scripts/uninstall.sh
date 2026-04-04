@@ -1,6 +1,6 @@
 #!/bin/bash
 # Trapic uninstall — remove MCP server, hooks, and CLAUDE.md instructions
-# Usage: curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/uninstall.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/uninstall.sh | bash
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
