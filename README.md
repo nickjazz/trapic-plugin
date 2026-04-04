@@ -1,221 +1,81 @@
-# Trapic — Long-term Memory for AI Coding Assistants
+# Trapic
 
-[![Version](https://img.shields.io/badge/version-0.6.0-blue)](https://github.com/nickjazz/trapic-plugin) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
+[![Version](https://img.shields.io/badge/version-0.7.0-blue)](https://github.com/trapicAi/trapic-plugin) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 
 [English](./README.md) | [繁體中文](./README.zh-TW.md) | [日本語](./README.ja.md)
 
-> **Your AI forgets everything between sessions. Trapic fixes that.**
->
-> Decisions, conventions, and discoveries — captured automatically, recalled instantly, decayed intelligently.
+**Your team's shared brain — every AI tool, one knowledge base.**
 
-## Why Trapic?
+---
 
-### 1. Auto-Recall: Every Session Starts Smart
+## The problem
 
-Your AI assistant loads project knowledge the moment a session begins — team decisions, coding conventions, cross-branch activity. No manual briefing. No "let me re-read the codebase." Just instant context.
+When your team uses AI tools, knowledge stays trapped in individual sessions. Sarah's AI doesn't know what James decided yesterday. Every conversation starts from zero.
 
-### 2. Knowledge Capture with Conflict Detection
+## The solution
 
-When you make a technical decision ("switch from Redux to Jotai"), Trapic silently records it. If it contradicts an earlier decision, the old one is automatically superseded — no stale knowledge, no contradictions.
+```
+You: "What did the team decide about the database?"
 
-### 3. Smart Decay: Knowledge That Ages Gracefully
+→ AI calls trapic-recall
+→ Instant answer with full reasoning, source, and context
+```
 
-Not all knowledge ages the same. A project status update (`state`) decays in 30 days. An architectural decision (`decision`) lasts 90. A naming convention (`convention`) holds for 180. Stale traces are flagged, reviewed, and cleaned up — automatically.
+Trapic connects your AI tools to a shared knowledge base. Decisions, conventions, and discoveries are captured as your team works — and available to everyone's AI, automatically.
 
 ---
 
 ## Install
 
-### Option A: One-Click Script (recommended)
-
-The most reliable setup. Run from your project root:
-
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/trapicAi/trapic-plugin/main/scripts/install.sh | bash
 ```
 
-This sets up everything in one shot:
-- MCP server config (`.mcp.json`)
-- SessionStart hook for auto-recall
-- CLAUDE.md instructions (so your AI knows to use Trapic even if hooks don't fire)
-- Token saved to `~/.claude/settings.json`
+Sign up at [trapic.ai](https://trapic.ai) to get your free API token.
 
-### Option B: Plugin
+---
 
-```bash
-/plugin marketplace add nickjazz/trapic-plugin
-/plugin install trapic@nickjazz-trapic-plugin
-```
+## Works with
 
-> **A note on Claude Code's plugin system:** The marketplace is still young. Hooks sometimes don't fire, env vars require manual setup, and error messages can be cryptic ("Duplicate hooks file detected" — thanks for that one, Anthropic). The plugin install works, but if you hit issues, Option A is battle-tested. We've filed our share of feedback. Hopefully things improve.
+Claude Code, Cursor, Windsurf, GitHub Copilot, Gemini CLI — any tool that supports MCP.
 
-Then set your token in `~/.claude/settings.json`:
+---
 
-```json
-{
-  "env": {
-    "TRAPIC_TOKEN": "tr_your_token_here"
-  }
-}
-```
+## Key features
 
-Sign up at [trapic.ai](https://trapic.ai) to get your API token. Restart Claude Code after adding the token.
+- **Auto-recall** — Your AI loads team knowledge at the start of every session. No briefing needed.
+- **Smart decay** — Knowledge has half-lives. Stale decisions get flagged before they cause problems.
+- **Conflict detection** — When a new decision contradicts an old one, Trapic catches it and keeps the record straight.
+- **Cross-tool** — Same knowledge base whether you use Claude, Cursor, Copilot, or all of them.
+- **Team sharing** — Private, team, or public visibility per piece of knowledge. You control what's shared.
 
-### Option C: Fully manual
-
-**1. Set your token** — edit `~/.claude/settings.json`:
-
-```json
-{
-  "env": {
-    "TRAPIC_TOKEN": "tr_your_token_here"
-  }
-}
-```
-
-**2. Add MCP server** — create `.mcp.json` in your project root (the `${TRAPIC_TOKEN}` is auto-filled from step 1):
-
-```json
-{
-  "mcpServers": {
-    "trapic": {
-      "type": "http",
-      "url": "https://mcp.trapic.ai/mcp",
-      "headers": {
-        "Authorization": "Bearer ${TRAPIC_TOKEN}"
-      }
-    }
-  }
-}
-```
-
-**3. Add auto-recall hook (optional)** — create `.claude/hooks/trapic-recall.sh`:
-
-```bash
-#!/bin/bash
-PROJECT=$(git remote get-url origin 2>/dev/null | sed 's|.*/||;s|\.git$||')
-BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
-[ -z "$PROJECT" ] && PROJECT=$(basename "$(pwd)")
-
-cat <<EOF
-Call trapic-recall to load project knowledge before responding:
-trapic-recall({ context: "session start", scope: ["project:${PROJECT}", "branch:${BRANCH}"], project: "${PROJECT}" })
-EOF
-```
-
-Then register the hook in `.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/trapic-recall.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-Restart Claude Code after setup.
-
-### Update
-
-```
-/plugin marketplace update nickjazz-trapic-plugin
-```
-
-### Uninstall
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/nickjazz/trapic-plugin/main/scripts/uninstall.sh | bash
-```
-
-Removes MCP config, hooks, CLAUDE.md instructions, and optionally your token.
-
-## What you get
-
-### 7 MCP Tools
-
-| Tool | What it does |
-|------|-------------|
-| `trapic-recall` | Load project knowledge at session start |
-| `trapic-create` | Create a new knowledge trace |
-| `trapic-search` | Search traces by keyword, tags, scope |
-| `trapic-update` | Update trace status, content, or tags |
-| `trapic-health` | Project knowledge health report |
-| `trapic-decay` | Scan for stale/decaying knowledge |
-| `trapic-review-stale` | Confirm or deprecate stale traces |
-
-### 4 Skills (plugin install only)
-
-| Skill | Trigger | What it does |
-|-------|---------|--------------|
-| **trapic-knowledge** | Auto (while coding) | Silently captures decisions, conventions, and facts with conflict detection |
-| **trapic-search** | `/trapic-search` or "find traces about..." | Smart search with topic-inferred filtering |
-| **trapic-review** | `/trapic-review` | Pre-commit convention check + stale knowledge cleanup |
-| **trapic-health** | `/trapic-health` or "knowledge status" | Health score, type distribution, decay metrics |
-
-### Auto-recall
-
-Every session automatically loads project knowledge on startup — foundations, team updates, cross-branch activity. No manual action needed.
-
-### Knowledge capture
-
-As you code, Trapic proactively captures decisions, conventions, and discoveries using `trapic-create`. The AI detects knowledge-worthy moments and records them silently — no manual action needed.
-
-### Live refresh
-
-For long sessions, `trapic-refresh` fetches only traces created since your last recall — keeping context current without reloading everything.
+---
 
 ## How it works
 
-1. **Session start** — Hook + CLAUDE.md triggers `trapic-recall`, loads full project context
-2. **During coding** — AI proactively captures decisions/conventions/facts via `trapic-create`
-3. **Mid-session** — `trapic-refresh` delivers differential updates (new team traces, status changes)
-4. **Before each decision** — Conflict detection searches by topic, supersedes outdated traces
-5. **Before commit** — `/trapic-review` checks staged diff against project conventions
-6. **Maintenance** — `/trapic-health` shows knowledge health, decay flags stale traces
+1. Someone on your team makes a decision — the AI captures it automatically
+2. Next time anyone's AI starts a session, it loads the latest team context
+3. Knowledge ages gracefully: quick status updates fade, architecture decisions persist
+4. Contradictions are detected and resolved, so your team stays aligned
 
-## Plugin Structure
+---
 
-```
-trapic-plugin/
-├── .claude-plugin/
-│   ├── plugin.json              # Plugin manifest
-│   └── marketplace.json         # Marketplace listing
-├── .mcp.json                    # MCP server connection
-├── hooks/
-│   └── hooks.json               # SessionStart auto-recall
-├── scripts/
-│   ├── install.sh               # One-click install (MCP + hooks + CLAUDE.md)
-│   ├── uninstall.sh             # Clean removal
-│   ├── recall.sh                # Auto-detect project/branch + token check
-│   └── setup.sh                 # Interactive setup guide
-└── skills/
-    ├── trapic-knowledge/        # Knowledge capture + conflict detection
-    ├── trapic-search/           # Smart search with topic inference
-    ├── trapic-review/           # Pre-commit check + stale cleanup
-    └── trapic-health/           # Health report + decay scan
-```
+## Pricing
 
-## Requirements
+**Free during beta.** Get started at [trapic.ai](https://trapic.ai).
 
-- [Claude Code](https://claude.ai/claude-code) CLI (or any MCP-compatible AI tool)
-- A Trapic account with API token ([trapic.ai](https://trapic.ai))
+---
+
+## Self-hosted
+
+Want to run Trapic on your own infrastructure? Check out [trapic-core](https://github.com/trapicAi/trapic-core) for the self-hosted option.
+
+---
 
 ## Links
 
 - Website: [trapic.ai](https://trapic.ai)
 - Documentation: [trapic.ai/docs](https://trapic.ai/docs)
-- MCP Server: `https://mcp.trapic.ai/mcp`
 
 ## License
 
